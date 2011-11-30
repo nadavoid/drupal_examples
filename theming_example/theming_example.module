@@ -1,0 +1,94 @@
+<?php
+
+/**
+ * @file
+ * Explains how a module declares theme functions, preprocess functions, and
+ * templates.
+ *
+ * The underlying approach is that a module should allow themes to do all
+ * rendering, but provide default implementations where appropriate.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function theming_example_menu() {
+  $items['examples/theming_example'] = array(
+    'title' => 'Basic Theming Example',
+    'description' => 'Some theming examples.',
+    'page callback' => 'theming_example_basic_content',
+    'access callback' => TRUE,
+    'access arguments' => array('access content'),
+  );
+  $items['examples/theming_example/theming_example_with_template'] = array(
+    'title' => 'Theming with a template and preprocess function',
+    'page callback' => 'theming_example_with_template',
+    'access arguments' => array('access content'),
+    'weight' => 1,
+  );
+
+  return $items;
+
+}
+
+/**
+ * Implements hook_theme().
+ *
+ * Defines the theming capabilities provided by this module.
+ *
+ * @see http://api.drupal.org/api/drupal/developer--hooks--core.php/function/hook_theme/6
+ */
+function theming_example_theme() {
+  return array(
+    'theming_example_basic_content' => array(
+      // arguments = required key.
+      'arguments' => array('content' => NULL),
+    ),
+    // When declaring a template file, a corresponding preprocess function
+    // is also automatically assigned. More preprocess functions can be
+    // added, by using the 'preprocess functions' element, commented out
+    // in this example.
+    'theming_example_with_template' => array(
+      'arguments' => array('content' => NULL),
+      'template' => 'theming_example_with_template',
+      // 'preprocess functions' => array('theming_example_with_template'),
+    ),
+  );
+}
+
+/**
+ * Initial landing page explaining the use of the module.
+ */
+function theming_example_basic_content() {
+  $content = t('Basic examples of pages that are run through theme functions.');
+  $content = theme('theming_example_basic_content', $content);
+  return $content;
+}
+
+/**
+ * Basic theme function
+ */
+function theme_theming_example_basic_content($content = NULL) {
+  $content = '<h3>' . t('The Content') . ':</h3>' . check_plain($content);
+  return $content;
+}
+
+/**
+ * Demonstrating using a template and preprocess function
+ */
+function theming_example_with_template() {
+  $content = t('This will get passed to a template, and optionally through a preprocess function.');
+  $content = theme('theming_example_with_template', $content);
+  return $content;
+}
+
+/**
+ * Template preprocess functions are called automatically when a template
+ * file is in use.
+ *
+ * template_preprocess_HOOKNAME
+ */
+function template_preprocess_theming_example_with_template(&$variables) {
+  $variables['content'] .= ' This text was added in a preprocess function.';
+}
+
